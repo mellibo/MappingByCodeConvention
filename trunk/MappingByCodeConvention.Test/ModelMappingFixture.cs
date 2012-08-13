@@ -47,14 +47,15 @@
         {
             // arrange
             this.mapper.BeforeMapClass += EntityConventions.TableNameEnglishPluralizedConvention;
-            
+            EntityConventions.ExcludeBaseEntity(this.mapper, typeof(Entity));
+
             // act
-            this.hbms = this.mapper.CompileMappingForAllExplicitlyAddedEntities();
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Comment), typeof(Person), typeof(Category) });
 
             // assert
-            this.hbms.Items.Count(x => (x as HbmClass).table == "Comments").Should().Be.EqualTo(1);
-            this.hbms.Items.Count(x => (x as HbmClass).table == "People").Should().Be.EqualTo(1);
-            this.hbms.Items.Count(x => (x as HbmClass).table == "Categories").Should().Be.EqualTo(1);
+            this.hbms.Items.OfType<HbmClass>().Count(x => x.table == "Comments").Should().Be.EqualTo(1);
+            this.hbms.Items.OfType<HbmClass>().Count(x => x.table == "People").Should().Be.EqualTo(1);
+            this.hbms.Items.OfType<HbmClass>().Count(x => x.table == "Categories").Should().Be.EqualTo(1);
         }
 
         [Test]
