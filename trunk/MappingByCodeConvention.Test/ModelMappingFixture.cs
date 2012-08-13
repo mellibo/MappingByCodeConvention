@@ -86,7 +86,7 @@
         }
 
         [Test]
-        public void MapStringLengthConvention()
+        public void MapStringLengthConventionFromCustomAttribute()
         {
             // arrange
             EntityConventions.ExcludeBaseEntity(this.mapper, typeof(Entity));
@@ -99,11 +99,39 @@
             this.hbms.Items.OfType<HbmClass>().First().Items.OfType<HbmProperty>().First(x => x.Name == "Message").length.Should().Be.EqualTo("400");
         }
 
+        [Test]
+        public void MapStringLengthConventionFromDataAnnotation()
+        {
+            // arrange
+            EntityConventions.ExcludeBaseEntity(this.mapper, typeof(Entity));
+            this.mapper.BeforeMapProperty += PropertiesConvention.MapStringLengthFromAttribute;
+
+            // act
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Post) });
+
+            // assert
+            this.hbms.Items.OfType<HbmClass>().First().Items.OfType<HbmProperty>().First(x => x.Name == "Caption").length.Should().Be.EqualTo("100");
+        }
+
+        [Test]
+        public void MapStringLengthConventionFromNHValidator()
+        {
+            // arrange
+            EntityConventions.ExcludeBaseEntity(this.mapper, typeof(Entity));
+            this.mapper.BeforeMapProperty += PropertiesConvention.MapStringLengthFromAttribute;
+
+            // act
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Comment) });
+
+            // assert
+            this.hbms.Items.OfType<HbmClass>().First().Items.OfType<HbmProperty>().First(x => x.Name == "Message").length.Should().Be.EqualTo("300");
+        }
+
         [TestFixtureSetUp]
         public void Setup()
         {
             this.mapper = new ConventionModelMapper();
-            var mappingTypes = typeof(CommentMapping).Assembly.GetTypes().Where(x => x.Name.EndsWith("Mapping"));
+            var mappingTypes = typeof(ComentarioMapping).Assembly.GetTypes().Where(x => x.Name.EndsWith("Mapping"));
             this.mapper.AddMappings(mappingTypes);
         }
 

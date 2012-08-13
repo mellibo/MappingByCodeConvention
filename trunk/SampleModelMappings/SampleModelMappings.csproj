@@ -47,7 +47,6 @@
     <Compile Include="Properties\Camion.cs" />
     <Compile Include="Properties\CategoryMapping.cs" />
     <Compile Include="Properties\ComentarioMapping.cs" />
-    <Compile Include="Properties\CommentMapping.cs" />
     <Compile Include="Properties\PersonMapping.cs" />
   </ItemGroup>
   <ItemGroup>

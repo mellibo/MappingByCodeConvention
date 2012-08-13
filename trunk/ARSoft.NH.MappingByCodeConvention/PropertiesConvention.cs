@@ -28,17 +28,30 @@ namespace ARSoft.NH.MappingByCodeConvention
             }
 
             var attributes = propertyInfo.GetCustomAttributes(true);
-            var attribute = attributes.OfType<LengthAttribute>().FirstOrDefault();
-            if (attribute != null)
+            var attribute = attributes.FirstOrDefault(x => x.GetType().Name.IndexOf("Length") > -1);
+            if (attribute == null)
             {
-                propertycustomizer.Length(attribute.Length);
+                return;
             }
-        }
-    }
+            int value = 0;
+            var possiblePropertyNames = new[] { "MaximumLength", "Length", "Max", "MaxLength" };
+            foreach (var name in possiblePropertyNames)
+            {
+                var attributeProperty = attribute.GetType().GetProperty(name);
+                if (attributeProperty != null)
+                {
+                    value = (int)attributeProperty.GetValue(attribute, null);
+                    break;
+                }
+            }
 
-    [AttributeUsage(AttributeTargets.Property)]
-    public class LengthAttribute:Attribute
-    {
-        public int Length { get; set; }
+            if (value == 0)
+            {
+                throw new InvalidOperationException(
+                    string.Format("could not get the length of property {0}", propertyInfo.Name));
+            }
+
+            propertycustomizer.Length(value);
+        }
     }
 }

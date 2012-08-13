@@ -3,10 +3,13 @@ namespace SampleModel.Entities
     using System;
     using System.Collections.Generic;
 
+    using NHibernate.Validator.Constraints;
+
     public class Comment : Entity
     {
         public virtual string NativeId { get; set; }
 
+        [Length(300)]
         public virtual string Message { get; set; }
 
         public virtual Post Post { get; set; }

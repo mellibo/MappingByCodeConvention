@@ -2,8 +2,10 @@ namespace SampleModel.Entities
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
 
     using ARSoft.NH.MappingByCodeConvention;
+    using ARSoft.NH.MappingByCodeConvention.MappingAttributes;
 
     public class Post : Entity
     {
@@ -15,9 +17,10 @@ namespace SampleModel.Entities
         
         public virtual Person To { get; set; }
 
-        [Length(Length = 400)]
+        [Length(400)]
         public virtual string Message { get; set; }
 
+        [StringLength(100)]
         public virtual string Caption { get; set; }
 
         public virtual DateTime PublishedTime { get; set; }
