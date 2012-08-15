@@ -6,8 +6,10 @@
     using ARSoft.NH.MappingByCodeConvention;
 
     using NHibernate;
+    using NHibernate.Cfg;
     using NHibernate.Cfg.MappingSchema;
     using NHibernate.Mapping.ByCode;
+    using NHibernate.Tool.hbm2ddl;
 
     using NUnit.Framework;
 
@@ -40,6 +42,7 @@
                 hbm.Id.Columns.ToArray()[0].name.Should().Be.EqualTo("POID");
                 hbm.Id.generator.@class.Should().Be.EqualTo("hilo");
             }
+
         }
 
         [Test]
@@ -56,6 +59,36 @@
             this.hbms.Items.OfType<HbmClass>().Count(x => x.table == "Comments").Should().Be.EqualTo(1);
             this.hbms.Items.OfType<HbmClass>().Count(x => x.table == "People").Should().Be.EqualTo(1);
             this.hbms.Items.OfType<HbmClass>().Count(x => x.table == "Categories").Should().Be.EqualTo(1);
+        }
+
+        [Test]
+        public void AllBagWithCascadeAll()
+        {
+            // arrange
+            this.mapper.BeforeMapBag += EntityConventions.MapBagsWithCascadeAll;
+            EntityConventions.ExcludeBaseEntity(this.mapper, typeof(Entity));
+
+            // act
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Comment), typeof(Post) });
+
+            // assert
+            var postMap = this.hbms.Items.OfType<HbmClass>().First(x => x.Name == "Post");
+            postMap.Items.OfType<HbmBag>().First().Cascade.Should().Be.EqualTo("all");
+        }
+
+        [Test]
+        public void AllBagWithCascadeSaveUpdate()
+        {
+            // arrange
+            this.mapper.BeforeMapBag += EntityConventions.MapBagsWithCascadePersist;
+            EntityConventions.ExcludeBaseEntity(this.mapper, typeof(Entity));
+
+            // act
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Comment), typeof(Post) });
+
+            // assert
+            var postMap = this.hbms.Items.OfType<HbmClass>().First(x => x.Name == "Post");
+            postMap.Items.OfType<HbmBag>().First().Cascade.Should().Be.EqualTo("save-update, persist");
         }
 
         [Test]
@@ -140,6 +173,13 @@
         public void TearDown()
         {
             Console.WriteLine(this.hbms.AsString());
+            var config = new Configuration().Configure("hibernate.cfg.xml");
+            config.AddMapping(this.hbms);
+            var schemaExport = new SchemaExport(config);
+            schemaExport.SetOutputFile("db.sql");
+            schemaExport.Create(true, true);
+            var sf = config.BuildSessionFactory();
+            sf.Dispose();
         }
     }
 }

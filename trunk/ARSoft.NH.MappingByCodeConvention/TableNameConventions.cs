@@ -20,5 +20,15 @@
             modelMapper.IsEntity((t, declared) => baseEntityType.IsAssignableFrom(t) && baseEntityType != t && !t.IsInterface);
             modelMapper.IsRootEntity((type, declared) => type.BaseType.Equals(baseEntityType));
         }
+
+        public static void MapBagsWithCascadeAll(IModelInspector modelinspector, PropertyPath member, IBagPropertiesMapper propertycustomizer)
+        {
+            propertycustomizer.Cascade(Cascade.All);
+        }
+
+        public static void MapBagsWithCascadePersist(IModelInspector modelinspector, PropertyPath member, IBagPropertiesMapper propertycustomizer)
+        {
+            propertycustomizer.Cascade(Cascade.Persist);
+        }
     }
 }
