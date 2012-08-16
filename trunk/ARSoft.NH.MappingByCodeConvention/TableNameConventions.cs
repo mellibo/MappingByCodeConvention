@@ -30,5 +30,15 @@
         {
             propertycustomizer.Cascade(Cascade.Persist);
         }
+
+        public static void MapSetWithCascadePersist(IModelInspector modelinspector, PropertyPath member, ISetPropertiesMapper propertyCustomizer)
+        {
+            propertyCustomizer.Cascade(Cascade.Persist);
+        }
+
+        public static void MapManyToOneWithCascade(IModelInspector modelinspector, PropertyPath member, IManyToOneMapper propertycustomizer)
+        {
+            propertycustomizer.Cascade(Cascade.Persist);
+        }
     }
 }

@@ -92,6 +92,36 @@
         }
 
         [Test]
+        public void AllSetWithCascadeSaveUpdate()
+        {
+            // arrange
+            this.mapper.BeforeMapSet += EntityConventions.MapSetWithCascadePersist;
+            EntityConventions.ExcludeBaseEntity(this.mapper, typeof(Entity));
+
+            // act
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Comment), typeof(Post), typeof(Page) });
+
+            // assert
+            var postMap = this.hbms.Items.OfType<HbmClass>().First(x => x.Name == "Page");
+            postMap.Items.OfType<HbmSet>().First().Cascade.Should().Be.EqualTo("save-update, persist");
+        }
+
+        [Test]
+        public void AllManyToOneCascade()
+        {
+            // arrange
+            this.mapper.BeforeMapManyToOne += EntityConventions.MapManyToOneWithCascade;
+            EntityConventions.ExcludeBaseEntity(this.mapper, typeof(Entity));
+
+            // act
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Comment), typeof(Post), typeof(Page) });
+
+            // assert
+            var postMap = this.hbms.Items.OfType<HbmClass>().First(x => x.Name == "Post");
+            postMap.Items.OfType<HbmManyToOne>().First().cascade.Should().Be.EqualTo("save-update, persist");
+        }
+
+        [Test]
         public void ExcludeBaseEntityConvention()
         {
             // arrange

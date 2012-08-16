@@ -4,14 +4,13 @@ namespace SampleModel.Entities
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
-    using ARSoft.NH.MappingByCodeConvention;
     using ARSoft.NH.MappingByCodeConvention.MappingAttributes;
 
     public class Post : Entity
     {
         public virtual Page Page { get; set; }
         
-        public virtual IEnumerable<Comment> Comments { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
 
         public virtual Person From { get; set; }
         
