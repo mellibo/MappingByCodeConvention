@@ -26,6 +26,32 @@
 
         private HbmMapping hbms;
 
+        private class Entidad
+        {
+            public int Id { get; set; }
+        }
+
+        [TestFixtureSetUp]
+        public void Setup()
+        {
+            this.mapper = new ConventionModelMapper();
+            var mappingTypes = typeof(ComentarioMapping).Assembly.GetTypes().Where(x => x.Name.EndsWith("Mapping"));
+            this.mapper.AddMappings(mappingTypes);
+        }
+
+        [TestFixtureTearDown]
+        public void TearDown()
+        {
+            Console.WriteLine(this.hbms.AsString());
+            var config = new Configuration().Configure("hibernate.cfg.xml");
+            config.AddMapping(this.hbms);
+            var schemaExport = new SchemaExport(config);
+            schemaExport.SetOutputFile("db.sql");
+            schemaExport.Create(true, true);
+            var sf = config.BuildSessionFactory();
+            sf.Dispose();
+        }
+
         [Test]
         public void AllIdNamedPOIDAndHilo()
         {
@@ -42,7 +68,39 @@
                 hbm.Id.Columns.ToArray()[0].name.Should().Be.EqualTo("POID");
                 hbm.Id.generator.@class.Should().Be.EqualTo("hilo");
             }
+        }
 
+        [Test]
+        public void AllIdIdentity()
+        {
+            // arrange
+            this.mapper.BeforeMapClass += IdConventions.AllIdIdentity;
+
+            // act
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Entidad) });
+
+            // assert
+            foreach (HbmClass hbm in this.hbms.Items)
+            {
+                hbm.Id.generator.@class.Should().Be.EqualTo("identity");
+            }
+        }
+
+        [Test]
+        public void AllIdHilo()
+        {
+            // arrange
+            this.mapper.BeforeMapClass += IdConventions.AllIdHilo;
+
+            // act
+            this.hbms = this.mapper.CompileMappingFor(new[] { typeof(Entidad) });
+
+            // assert
+            foreach (HbmClass hbm in this.hbms.Items)
+            {
+                hbm.Id.generator.Should().Not.Be.Null();
+                hbm.Id.generator.@class.Should().Be.EqualTo("hilo");
+            }
         }
 
         [Test]
@@ -189,27 +247,6 @@
 
             // assert
             this.hbms.Items.OfType<HbmClass>().First().Items.OfType<HbmProperty>().First(x => x.Name == "Message").length.Should().Be.EqualTo("300");
-        }
-
-        [TestFixtureSetUp]
-        public void Setup()
-        {
-            this.mapper = new ConventionModelMapper();
-            var mappingTypes = typeof(ComentarioMapping).Assembly.GetTypes().Where(x => x.Name.EndsWith("Mapping"));
-            this.mapper.AddMappings(mappingTypes);
-        }
-
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            Console.WriteLine(this.hbms.AsString());
-            var config = new Configuration().Configure("hibernate.cfg.xml");
-            config.AddMapping(this.hbms);
-            var schemaExport = new SchemaExport(config);
-            schemaExport.SetOutputFile("db.sql");
-            schemaExport.Create(true, true);
-            var sf = config.BuildSessionFactory();
-            sf.Dispose();
         }
     }
 }

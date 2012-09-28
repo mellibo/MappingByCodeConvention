@@ -59,6 +59,7 @@
     <Compile Include="Entities\CommentRuleWordsBase.cs" />
     <Compile Include="Entities\Customer.cs" />
     <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityHierarchy.cs" />
     <Compile Include="Entities\FacebookPerson.cs" />
     <Compile Include="Entities\IFacebookPerson.cs" />
     <Compile Include="Entities\IPerson.cs" />

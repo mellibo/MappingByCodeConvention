@@ -10,6 +10,17 @@
         {
             map.Id(x => x.Generator(Generators.HighLow));
             map.Id(x => x.Column("POID"));
+            map.Id(x => x.Type(null));
+        }
+
+        public static void AllIdIdentity(IModelInspector modelinspector, Type type, IClassAttributesMapper classcustomizer)
+        {
+            classcustomizer.Id(x => x.Generator(Generators.Identity));
+        }
+
+        public static void AllIdHilo(IModelInspector modelinspector, Type type, IClassAttributesMapper classcustomizer)
+        {
+            classcustomizer.Id(x => x.Generator(Generators.HighLow));
         }
     }
 }
